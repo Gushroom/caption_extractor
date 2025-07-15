@@ -1,0 +1,17 @@
+identity:
+  author: bohui-litianhao
+  name: caption_extractor
+  label:
+    en_US: caption_extractor
+    zh_Hans: caption_extractor
+    pt_BR: caption_extractor
+  description:
+    en_US: Extract only caption text and bounding boxes from all OCR results
+    zh_Hans: Extract only caption text and bounding boxes from all OCR results
+    pt_BR: Extract only caption text and bounding boxes from all OCR results
+  icon: icon.svg
+tools:
+  - tools/caption_extractor.yaml
+extra:
+  python:
+    source: provider/caption_extractor.py

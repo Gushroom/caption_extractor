@@ -1,0 +1,35 @@
+version: 0.0.1
+type: plugin
+author: bohui-litianhao
+name: caption_extractor
+label:
+  en_US: caption_extractor
+  ja_JP: caption_extractor
+  zh_Hans: caption_extractor
+  pt_BR: caption_extractor
+description:
+  en_US: Extract only caption text and bounding boxes from all OCR results
+  ja_JP: Extract only caption text and bounding boxes from all OCR results
+  zh_Hans: Extract only caption text and bounding boxes from all OCR results
+  pt_BR: Extract only caption text and bounding boxes from all OCR results
+icon: icon.svg
+resource:
+  memory: 268435456
+  permission:
+    tool:
+      enabled: true
+plugins:
+  tools:
+    - provider/caption_extractor.yaml
+meta:
+  version: 0.0.1
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+created_at: 2025-07-15T15:02:30.612613+08:00
+privacy: PRIVACY.md
+verified: false

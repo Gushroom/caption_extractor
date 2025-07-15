@@ -1,0 +1,30 @@
+identity:
+  name: caption_extractor
+  author: bohui-litianhao
+  label:
+    en_US: caption_extractor
+    zh_Hans: caption_extractor
+    pt_BR: caption_extractor
+description:
+  human:
+    en_US: Extract only caption text and bounding boxes from all OCR results
+    zh_Hans: Extract only caption text and bounding boxes from all OCR results
+    pt_BR: Extract only caption text and bounding boxes from all OCR results
+  llm: Extract only caption text and bounding boxes from all OCR results
+parameters:
+  - name: raw_ocr_text
+    type: string
+    required: true
+    label:
+      en_US: raw_ocr_text
+      zh_Hans: 包含多余信息的OCR结果JSON字符串
+      pt_BR: raw_ocr_text
+    human_description:
+      en_US: Extract only caption text and bounding boxes from all OCR results
+      zh_Hans: Extract only caption text and bounding boxes from all OCR results
+      pt_BR: Extract only caption text and bounding boxes from all OCR results
+    llm_description: Extract only caption text and bounding boxes from all OCR results
+    form: llm
+extra:
+  python:
+    source: tools/caption_extractor.py
