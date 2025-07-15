@@ -1,16 +1,16 @@
 version: 0.0.1
 type: plugin
-author: bohui-litianhao
+author: Gushroom
 name: caption_extractor
 label:
   en_US: caption_extractor
   ja_JP: caption_extractor
-  zh_Hans: caption_extractor
+  zh_Hans: 字幕提取
   pt_BR: caption_extractor
 description:
   en_US: Extract only caption text and bounding boxes from all OCR results
   ja_JP: Extract only caption text and bounding boxes from all OCR results
-  zh_Hans: Extract only caption text and bounding boxes from all OCR results
+  zh_Hans: 从全部OCR结果中提取字幕
   pt_BR: Extract only caption text and bounding boxes from all OCR results
 icon: icon.svg
 resource:
