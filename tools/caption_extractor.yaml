@@ -1,6 +1,6 @@
 identity:
   name: caption_extractor
-  author: bohui-litianhao
+  author: gushroom
   label:
     en_US: caption_extractor
     zh_Hans: caption_extractor
@@ -8,7 +8,7 @@ identity:
 description:
   human:
     en_US: Extract only caption text and bounding boxes from all OCR results
-    zh_Hans: Extract only caption text and bounding boxes from all OCR results
+    zh_Hans: 从全部的OCR结果中提取字幕字符串
     pt_BR: Extract only caption text and bounding boxes from all OCR results
   llm: Extract only caption text and bounding boxes from all OCR results
 parameters:
@@ -20,11 +20,39 @@ parameters:
       zh_Hans: 包含多余信息的OCR结果JSON字符串
       pt_BR: raw_ocr_text
     human_description:
-      en_US: Extract only caption text and bounding boxes from all OCR results
-      zh_Hans: Extract only caption text and bounding boxes from all OCR results
-      pt_BR: Extract only caption text and bounding boxes from all OCR results
-    llm_description: Extract only caption text and bounding boxes from all OCR results
+      en_US: The raw OCR result in JSON format, contains timestamps and other texts.
+      zh_Hans: 包含多余信息的OCR结果JSON字符串
+      pt_BR: The raw OCR result, contains timestamps and other texts.
+    llm_description: The raw OCR result in JSON format, contains timestamps and other texts.
     form: llm
+  - name: left_index
+    type: number
+    required: false
+    default: 
+    label:
+      en_US: left_index
+      zh_Hans: 用于切分字幕的关键帧（左）
+      pt_BR: left_index
+    human_description: 
+      en_US: The left frame index indicating where the user wants the result to be sliced, between 'left' and 'middle'.
+      zh_Hans: 用于切分字幕的关键帧（左），在返回的'left'字符串和'middle'字符串之间。
+      pt_BR: The left frame index indicating where the user wants the result to be sliced, between 'left' and 'middle'.
+    llm_description: The left frame index indicating where the user wants the result to be sliced, between 'left' and 'middle'.
+    form: form
+  - name: right_index
+    type: number
+    required: false
+    default: 
+    label:
+      en_US: right_index
+      zh_Hans: 用于切分字幕的关键帧（右）
+      pt_BR: right_index
+    human_description: 
+      en_US: The right frame index indicating where the user wants the result to be sliced, between 'middle' and 'right'.
+      zh_Hans: 用于切分字幕的关键帧（右），在返回的'middle'字符串和'right'字符串之间。
+      pt_BR: The right frame index indicating where the user wants the result to be sliced, between 'middle' and 'right'.
+    llm_description: The right frame index indicating where the user wants the result to be sliced, between 'middle' and 'right'.
+    form: form
 extra:
   python:
     source: tools/caption_extractor.py

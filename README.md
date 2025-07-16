@@ -1,7 +1,7 @@
 ## caption_extractor
 
-**Author:** bohui-litianhao
-**Version:** 0.0.1
+**Author:** Gushroom
+**Version:** 0.0.2
 **Type:** tool
 
 ### Description

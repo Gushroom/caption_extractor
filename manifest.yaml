@@ -1,6 +1,6 @@
-version: 0.0.1
+version: 0.0.2
 type: plugin
-author: Gushroom
+author: gushroom
 name: caption_extractor
 label:
   en_US: caption_extractor
@@ -22,7 +22,7 @@ plugins:
   tools:
     - provider/caption_extractor.yaml
 meta:
-  version: 0.0.1
+  version: 0.0.2
   arch:
     - amd64
     - arm64
@@ -32,4 +32,4 @@ meta:
     entrypoint: main
 created_at: 2025-07-15T15:02:30.612613+08:00
 privacy: PRIVACY.md
-verified: false
+verified: False

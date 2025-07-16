@@ -10,7 +10,7 @@ from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
 class CaptionExtractorTool(Tool):
-    def extract_caption(self, input_text: str) -> dict[str, str]: 
+    def extract_caption(self, input_text: str, left_index: int = None, right_index: int = None) -> dict[str, str]: 
         try:
             data = json.loads(input_text)
 
@@ -95,8 +95,22 @@ class CaptionExtractorTool(Tool):
                     }
                     output_data.append(frame_object)
 
+            if left_index and right_index:
+                left = [item for item in output_data if item['index'] < left_index]
+                middle = [item for item in output_data if left_index <= item['index'] < right_index]
+                right = [item for item in output_data if item['index'] >= right_index]
+
+                return {
+                    "left": left,
+                    "middle": middle,
+                    "right": right
+                }
+            
             result = json.dumps(output_data, ensure_ascii=False, indent=4)
-            return result
+            return {
+                "result": result
+            }
+            
         except Exception as e:
             raise ValueError(f"Caption extraction failed: {str(e)}")
 
@@ -104,12 +118,19 @@ class CaptionExtractorTool(Tool):
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
 
         raw_ocr_text = tool_parameters.get("raw_ocr_text")
+        left_index = tool_parameters.get("left_index")
+        right_index = tool_parameters.get("right_index")
         if not raw_ocr_text:
             yield self.create_json_message({
                 "result": "请提供原始的OCR结果"
             })
             return
-        result = self.extract_caption(raw_ocr_text)
-        yield self.create_json_message({
-            "result": result
-        })
+        if left_index or right_index: # 如果给了要切分的帧
+            if not (left_index and right_index): # 但只给了一个
+                yield self.create_json_message({
+                    "result": "请同时提供左入点和右出点的索引"
+                })
+                return
+        
+        result = self.extract_caption(raw_ocr_text, left_index, right_index)
+        yield self.create_json_message(result)
