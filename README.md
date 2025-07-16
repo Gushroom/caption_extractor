@@ -1,7 +1,7 @@
 ## caption_extractor
 
 **Author:** Gushroom
-**Version:** 0.0.2
+**Version:** 0.2.0
 **Type:** tool
 
 ### Description
