@@ -1,5 +1,6 @@
 import json
 import math
+import re
 from collections import Counter, defaultdict
 from itertools import groupby
 from collections.abc import Generator
@@ -8,7 +9,22 @@ from typing import Any
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+
 class CaptionExtractorTool(Tool):
+    def _clean_text(self, text: str) -> str:
+        """
+        Cleans a string, keeping only Chinese characters and numbers.
+
+        Args:
+            text: The input string.
+
+        Returns:
+            A new string containing only valid characters, or an empty string.
+        """
+        if not text:
+            return ""
+        pattern = re.compile(r'[\x00-\x2F\x3A-\x7F]')
+        return pattern.sub('', text)
     def _custom_dbscan(self, coords: list[list[float]], eps: float, min_samples: int) -> list[int]:
         """
         A pure Python implementation of the DBSCAN clustering algorithm.
@@ -97,19 +113,28 @@ class CaptionExtractorTool(Tool):
         try:
             data = json.loads(input_text)
 
-            # Flatten the data from frames into a single list of text objects
+            # Flatten the data and apply cleaning/filtering
             all_texts = []
             for item in data:
                 for text_info in item.get('texts', []):
-                    loc = text_info.get('location', {})
-                    all_texts.append({
-                        'text': text_info.get('text'),
-                        'width': loc.get('widthInPixel'),
-                        'height': loc.get('heightInPixel'),
-                        'top': loc.get('topOffsetInPixel'),
-                        'left': loc.get('leftOffsetInPixel'),
-                        'frame_index': item.get('index')
-                    })
+                    original_text = text_info.get('text')
+                    if not original_text:
+                        continue
+                    
+                    # Clean the text using the helper method
+                    cleaned_text = self._clean_text(original_text)
+
+                    # Only proceed if the cleaned text is not empty
+                    if cleaned_text.strip():
+                        loc = text_info.get('location', {})
+                        all_texts.append({
+                            'text': cleaned_text, 
+                            'width': loc.get('widthInPixel'),
+                            'height': loc.get('heightInPixel'),
+                            'top': loc.get('topOffsetInPixel'),
+                            'left': loc.get('leftOffsetInPixel'),
+                            'frame_index': item.get('index')
+                        })
             
             if not all_texts:
                 return {"result": "[]"}
@@ -143,28 +168,32 @@ class CaptionExtractorTool(Tool):
             largest_cluster_label = cluster_counts.most_common(1)[0][0]
             captions = [t for t in clustered_texts if t['cluster'] == largest_cluster_label]
 
-            # Deduplicate captions that appear in the same position across consecutive frames
-            # Sort to bring identical, consecutive captions together
-            captions.sort(key=lambda x: (x['top'] // 10, x['left'] // 10, x['text'], x['frame_index']))
+            captions.sort(key=lambda x: x['frame_index'])
             
-            deduplicated_captions = []
-            # Use groupby to find blocks of identical text in similar positions
-            for key, group in groupby(captions, key=lambda x: (x['text'], x['top'] // 10, x['left'] // 10)):
-                block = list(group)
-                # Check if frames are consecutive
-                is_consecutive = True
-                for i in range(len(block) - 1):
-                    if block[i+1]['frame_index'] - block[i]['frame_index'] > 1: # Allow a gap of 1 frame
-                        is_consecutive = False
-                        break
+            if not captions:
+                return {"result": "[]"}
+            print("Before dedup:", [(c['frame_index'], c['text']) for c in captions])
+            deduplicated_captions = [captions[0]]
+            
+            # Max gap between frames for captions to be considered consecutive
+            FRAME_GAP_TOLERANCE = 2
+
+            for i in range(1, len(captions)):
+                current_cap = captions[i]
+                last_kept_cap = deduplicated_captions[-1]
+
+                # Check if it's a duplicate of the last kept caption
+                is_same_text = current_cap['text'] == last_kept_cap['text']
+                is_consecutive_frame = (current_cap['frame_index'] - last_kept_cap['frame_index']) <= FRAME_GAP_TOLERANCE
+
+                # If the text is the same and the frame is consecutive, skip it
+                if is_same_text and is_consecutive_frame:
+                    continue
                 
-                # If consecutive, only keep the first one. Otherwise, keep all.
-                if is_consecutive:
-                    deduplicated_captions.append(block[0])
-                else:
-                    deduplicated_captions.extend(block)
+                # Otherwise, it's a new, unique caption, so we keep it
+                deduplicated_captions.append(current_cap)
 
-
+            print("After dedup:", [(c['frame_index'], c['text']) for c in deduplicated_captions])
             # Group by frame index and format the final output
             output_by_frame = defaultdict(list)
             for cap in deduplicated_captions:
