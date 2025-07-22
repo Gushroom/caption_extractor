@@ -1,4 +1,4 @@
-version: 0.2.1
+version: 0.2.2
 type: plugin
 author: gushroom
 name: caption_extractor
@@ -22,7 +22,7 @@ plugins:
   tools:
     - provider/caption_extractor.yaml
 meta:
-  version: 0.2.1
+  version: 0.2.2
   arch:
     - amd64
     - arm64
