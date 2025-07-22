@@ -172,7 +172,7 @@ class CaptionExtractorTool(Tool):
             
             if not captions:
                 return {"result": "[]"}
-            print("Before dedup:", [(c['frame_index'], c['text']) for c in captions])
+            # print("Before dedup:", [(c['frame_index'], c['text']) for c in captions])
             deduplicated_captions = [captions[0]]
             
             # Max gap between frames for captions to be considered consecutive
@@ -193,7 +193,7 @@ class CaptionExtractorTool(Tool):
                 # Otherwise, it's a new, unique caption, so we keep it
                 deduplicated_captions.append(current_cap)
 
-            print("After dedup:", [(c['frame_index'], c['text']) for c in deduplicated_captions])
+            # print("After dedup:", [(c['frame_index'], c['text']) for c in deduplicated_captions])
             # Group by frame index and format the final output
             output_by_frame = defaultdict(list)
             for cap in deduplicated_captions:
