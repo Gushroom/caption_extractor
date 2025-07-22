@@ -129,10 +129,10 @@ class CaptionExtractorTool(Tool):
                         loc = text_info.get('location', {})
                         all_texts.append({
                             'text': cleaned_text, 
-                            'width': loc.get('widthInPixel'),
-                            'height': loc.get('heightInPixel'),
-                            'top': loc.get('topOffsetInPixel'),
-                            'left': loc.get('leftOffsetInPixel'),
+                            'width': loc.get('w'),
+                            'height': loc.get('h'),
+                            'top': loc.get('t'),
+                            'left': loc.get('l'),
                             'frame_index': item.get('index')
                         })
             
@@ -206,10 +206,10 @@ class CaptionExtractorTool(Tool):
                     texts_list.append({
                         "text": row['text'],
                         "location": {
-                            "widthInPixel": int(row['width']),
-                            "heightInPixel": int(row['height']),
-                            "topOffsetInPixel": int(row['top']),
-                            "leftOffsetInPixel": int(row['left'])
+                            "w": int(row['width']),
+                            "h": int(row['height']),
+                            "t": int(row['top']),
+                            "l": int(row['left'])
                         }
                     })
                 output_data.append({
