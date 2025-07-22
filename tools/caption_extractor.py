@@ -176,7 +176,7 @@ class CaptionExtractorTool(Tool):
             deduplicated_captions = [captions[0]]
             
             # Max gap between frames for captions to be considered consecutive
-            FRAME_GAP_TOLERANCE = 2
+            # FRAME_GAP_TOLERANCE = 2
 
             for i in range(1, len(captions)):
                 current_cap = captions[i]
@@ -184,10 +184,10 @@ class CaptionExtractorTool(Tool):
 
                 # Check if it's a duplicate of the last kept caption
                 is_same_text = current_cap['text'] == last_kept_cap['text']
-                is_consecutive_frame = (current_cap['frame_index'] - last_kept_cap['frame_index']) <= FRAME_GAP_TOLERANCE
+                # is_consecutive_frame = (current_cap['frame_index'] - last_kept_cap['frame_index']) <= FRAME_GAP_TOLERANCE
 
                 # If the text is the same and the frame is consecutive, skip it
-                if is_same_text and is_consecutive_frame:
+                if is_same_text: # and is_consecutive_frame
                     continue
                 
                 # Otherwise, it's a new, unique caption, so we keep it
