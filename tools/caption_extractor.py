@@ -145,14 +145,22 @@ class CaptionExtractorTool(Tool):
                 text_info['center_y'] = text_info['top'] + text_info['height'] / 2
             
             max_y = max(t['top'] + t['height'] for t in all_texts)
-            lower_region_texts = [t for t in all_texts if t['center_y'] > max_y * 0.4]
+            frame_center_x = max(t['left'] + t['width'] for t in all_texts) / 2
+            MIN_ASPECT_RATIO = 1.5
+            horizontal_texts = [
+                t for t in all_texts
+                if t['width'] / (t['height'] + 1e-5) > MIN_ASPECT_RATIO
+            ]
+            if not horizontal_texts:
+                return {"result": "[]"}
+            lower_region_texts = [t for t in horizontal_texts if t['center_y'] > max_y * 0.4]
 
             if not lower_region_texts:
                 return {"result": "[]"}
 
             # Perform DBSCAN clustering
             coords = [[t['center_x'], t['center_y']] for t in lower_region_texts]
-            cluster_labels = self._custom_dbscan(coords, eps=50, min_samples=2)
+            cluster_labels = self._custom_dbscan(coords, eps=20, min_samples=20)
             
             for i, text_info in enumerate(lower_region_texts):
                 text_info['cluster'] = cluster_labels[i]
@@ -162,11 +170,28 @@ class CaptionExtractorTool(Tool):
             if not clustered_texts:
                 return {"result": "[]"}
 
-            cluster_counts = Counter(t['cluster'] for t in clustered_texts)
-            if not cluster_counts:
-                 return {"result": "[]"}
-            largest_cluster_label = cluster_counts.most_common(1)[0][0]
-            captions = [t for t in clustered_texts if t['cluster'] == largest_cluster_label]
+            clusters = defaultdict(list)
+            for t in clustered_texts:
+                clusters[t['cluster']].append(t)
+
+            # Score clusters by size and proximity to horizontal center
+            CENTER_THRESHOLD = 300  # pixels
+
+            # Find all clusters within the center threshold
+            centered_clusters = {
+                label: texts
+                for label, texts in clusters.items()
+                if abs(sum(t['center_x'] for t in texts) / len(texts) - frame_center_x) <= CENTER_THRESHOLD
+            }
+
+            # Pick the largest one among those
+            if centered_clusters:
+                best_cluster_label = max(centered_clusters.keys(), key=lambda label: len(centered_clusters[label]))
+            else:
+                # Fallback: just pick the overall largest cluster
+                best_cluster_label = max(clusters.keys(), key=lambda label: len(clusters[label]))
+
+            captions = clusters[best_cluster_label]
 
             captions.sort(key=lambda x: x['frame_index'])
             
